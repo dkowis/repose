@@ -31,6 +31,7 @@ public class ProxyServlet extends HttpServlet {
         if (initialized) {
             return true;
         }
+        //TODO: this should check to see if the spring context is ready to go
 
         PowerApiContextManager manager = (PowerApiContextManager) getServletContext().getAttribute("powerApiContextManager");
 

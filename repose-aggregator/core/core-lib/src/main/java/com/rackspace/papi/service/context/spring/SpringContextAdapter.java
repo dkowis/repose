@@ -25,6 +25,7 @@ import com.rackspace.papi.service.routing.RoutingService;
 import com.rackspace.papi.service.threading.ThreadingService;
 import org.springframework.context.ApplicationContext;
 
+//TODO: this is a terrible class that I don't think is necessary.
 public class SpringContextAdapter implements ContextAdapter {
 
    private final ApplicationContext applicationContext;

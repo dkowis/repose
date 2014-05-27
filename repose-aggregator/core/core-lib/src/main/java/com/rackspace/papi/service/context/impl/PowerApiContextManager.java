@@ -25,6 +25,13 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.util.Map;
 
+/**
+ * TODO: THIS WHOLE CLASS SHOULD BE DELETED BY THE spring framework ContextLoaderListener
+ * It will tie the application context lifecycle to the servlet context lifecycle, which is exactly what we want... I hope
+ * But will it even work in valve?
+ * # YES: http://stackoverflow.com/questions/10738816/deploying-a-servlet-programmatically-with-
+ * TODO: THIS WHOLE CLASS SHOULD DIEEEEEE!!!!!!!!!!!!1111111111111
+ */
 public class PowerApiContextManager implements ServletContextListener {
 
    private static final Logger LOG = LoggerFactory.getLogger(PowerApiContextManager.class);
@@ -44,6 +51,7 @@ public class PowerApiContextManager implements ServletContextListener {
       return this;
    }
 
+    //TODO: it seems that the "connectionFramework" is deprecated EITHER WAY, therefore don't care?
    private AbstractApplicationContext initApplicationContext(ServletContext servletContext) {
       final String connectionFrameworkProp = InitParameter.CONNECTION_FRAMEWORK.getParameterName();
       final String connectionFramework = System.getProperty(connectionFrameworkProp, servletContext.getInitParameter(connectionFrameworkProp));
@@ -65,6 +73,8 @@ public class PowerApiContextManager implements ServletContextListener {
 
    }
 
+    //TODO: have to figure out a way to handle this... I'm not even sure why it's here
+    // it's only to hide the spring stuff in here... May have to find a different way to add parameters
    private void configurePorts(ApplicationContext context) {
       if (ports == null || context == null) {
          return;
@@ -74,6 +84,8 @@ public class PowerApiContextManager implements ServletContextListener {
       servicePorts.addAll(ports);
    }
 
+    //TODO: this will have to be handled somewhere else also
+    // Probably a standalone bean?
    private void configureReposeInfo(ApplicationContext context) {
       if (instanceInfo == null) {
 
@@ -148,14 +160,21 @@ public class PowerApiContextManager implements ServletContextListener {
       applicationContext = initApplicationContext(servletContext);
 
       //Allows Repose to set any header to pass to the origin service. Namely the "Via" header
+       //TODO: this seems like a bad place to set a system property :(
       System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 
       // Most bootstrap steps require or will try to load some kind of
       // configuration so we need to set our naming context in the servlet context
       // first before anything else
+       //TODO: why not do this in spring? Put this into a bean of some sort instead
       ServletContextHelper.configureInstance(
               servletContext,
               applicationContext);
+
+       //Programmatically at this point create a servlet context bean.
+       // At this point, there will be a component available to autowire in.
+       // I think this will properly make things work...
+       // http://www.carlobonamico.com/blog/?p=55
 
       intializeServices(sce);
       servletContext.setAttribute("powerApiContextManager", this);
@@ -176,13 +195,16 @@ public class PowerApiContextManager implements ServletContextListener {
          bean.contextDestroyed(sce);
       }
 
+       //TODO: get rid of the service registry
       ServiceRegistry registry = applicationContext.getBean("serviceRegistry", ServiceRegistry.class);
       for (ServiceContext ctx : registry.getServices()) {
          ctx.contextDestroyed(sce);
       }
 
       LOG.info("Shutting down Spring application context");
+       //So spring will automatically call PreDestroy on all things, we don't need to have a serviceRegistry...
       applicationContext.close();
+
 
    }
 }

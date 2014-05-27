@@ -25,6 +25,7 @@ public final class EmptyServlet extends HttpServlet {
          return true;
       }
 
+       //TODO: this should check to see if the spring context is ready to go.
       PowerApiContextManager manager = (PowerApiContextManager) getServletContext().getAttribute("powerApiContextManager");
 
       if (manager == null || !manager.isContextInitialized()) {

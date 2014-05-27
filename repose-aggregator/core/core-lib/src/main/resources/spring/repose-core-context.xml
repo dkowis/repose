@@ -9,11 +9,12 @@
                            http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <!-- Import Repose Services -->
-
     <context:component-scan base-package="com.rackspace"/>
     <context:annotation-config/>
-    <!-- <context:mbean-export/> -->
 
+    <!--
+     The docs say this must NOT be done lazily: http://docs.spring.io/spring/docs/2.5.x/reference/jmx.html
+     -->
     <bean id="exporter" class="org.springframework.jmx.export.annotation.AnnotationMBeanExporter" lazy-init="true">
         <property name="namingStrategy" ref="reposeJmxNamingStrategy"/>
     </bean>

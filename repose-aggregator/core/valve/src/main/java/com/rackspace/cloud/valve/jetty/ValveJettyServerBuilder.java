@@ -93,16 +93,23 @@ public class ValveJettyServerBuilder {
 
     private ServletContextHandler buildRootContext(Server serverReference) {
         final ServletContextHandler servletContext = new ServletContextHandler(serverReference, "/");
+        //TODO: use the setInitParam() method...
         servletContext.getInitParams().put(InitParameter.POWER_API_CONFIG_DIR.getParameterName(), configurationPathAndFile);
         servletContext.getInitParams().put(InitParameter.CONNECTION_FRAMEWORK.getParameterName(), connectionFramework);
         servletContext.getInitParams().put(InitParameter.INSECURE.getParameterName(), Boolean.toString(insecure));
         servletContext.getInitParams().put(InitParameter.REPOSE_CLUSTER_ID.getParameterName(), clusterId);
         servletContext.getInitParams().put(InitParameter.REPOSE_NODE_ID.getParameterName(), nodeId);
-        
+
+
         ReposeInstanceInfo instanceInfo = new ReposeInstanceInfo(clusterId, nodeId);
         try {
+            //TODO: instead of creating a PAPI Context Manager, create a ContextLoaderListener.
+            // This will fire up a spring context exactly like we expect
             PowerApiContextManager contextManager = PowerApiContextManager.class.newInstance();
-            contextManager.setPorts(ports,instanceInfo);
+            contextManager.setPorts(ports,instanceInfo); //TODO: how I get ports into something that cares?
+            //TODO: just add the ports to a bean. so that they can be read by things that care about it
+            // Yeah this should work, get the ports bean by name, if this is where they need to be, and do something about them
+            //TODO: add the service prots to the context as attributes?
             servletContext.addEventListener(contextManager);
         } catch (InstantiationException e) {
             throw new PowerAppException("Unable to instantiate PowerApiContextManager", e);

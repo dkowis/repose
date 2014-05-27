@@ -43,12 +43,12 @@ public final class ServletContextHelper implements Serializable {
         ctx.setAttribute(SPRING_APPLICATION_CONTEXT_ATTRIBUTE_NAME, applicationContext);
     }
 
+    //TODO: these are just spring components. wat
     public ServicePorts getServerPorts() {
         return context.getBean("servicePorts", ServicePorts.class);
     }
 
     public ReposeInstanceInfo getReposeInstanceInfo() {
         return context.getBean("reposeInstanceInfo", ReposeInstanceInfo.class);
-
     }
 }
