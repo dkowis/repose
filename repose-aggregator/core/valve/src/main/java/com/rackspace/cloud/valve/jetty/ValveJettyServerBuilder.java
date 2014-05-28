@@ -16,6 +16,7 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.springframework.web.context.ContextLoaderListener;
 
 import javax.servlet.DispatcherType;
 import java.io.File;
@@ -110,7 +111,9 @@ public class ValveJettyServerBuilder {
             //TODO: just add the ports to a bean. so that they can be read by things that care about it
             // Yeah this should work, get the ports bean by name, if this is where they need to be, and do something about them
             //TODO: add the service prots to the context as attributes?
-            servletContext.addEventListener(contextManager);
+            //servletContext.addEventListener(contextManager);
+            //This is the spring one....
+            servletContext.addEventListener(new ContextLoaderListener());
         } catch (InstantiationException e) {
             throw new PowerAppException("Unable to instantiate PowerApiContextManager", e);
         } catch (IllegalAccessException e) {

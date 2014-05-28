@@ -22,9 +22,13 @@
     <!-- TODO: use the org.springframework.web.context.ContextLoaderListener' -->
     <!-- Yep: http://stackoverflow.com/questions/11815339/role-purpose-of-contextloaderlistener-in-spring -->
     <listener>
+        <display-name>Spring Context Loader</display-name>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!-- <listener>
         <display-name>Repose Context Loader</display-name>
         <listener-class>com.rackspace.papi.service.context.impl.PowerApiContextManager</listener-class>
-    </listener>
+    </listener> -->
 
     <!-- Servlets -->
     <servlet id="power-api-servlet">
