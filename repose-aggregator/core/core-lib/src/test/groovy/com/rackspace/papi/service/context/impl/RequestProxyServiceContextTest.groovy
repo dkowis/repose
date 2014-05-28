@@ -47,8 +47,7 @@ class RequestProxyServiceContextTest extends Specification {
 
         when(healthCheckService.register(any(Class.class))).thenReturn("test_uid")
 
-        requestProxyServiceContext = new RequestProxyServiceContext(requestProxyService, serviceRegistry,
-                configurationService, systemModelInterrogator, healthCheckService)
+        requestProxyServiceContext = new RequestProxyServiceContext(requestProxyService, configurationService, systemModelInterrogator, healthCheckService)
     }
 
     def "if localhost can find self in system model on update, should resolve outstanding issues with health check service"() {

@@ -17,10 +17,9 @@
     <bean name="httpConnectionPoolServiceContext"
           class="com.rackspace.papi.service.context.impl.HttpConnectionPoolServiceContext">
       
-        <constructor-arg index="0" ref="serviceRegistry"/>
-        <constructor-arg index="1" ref="configurationManager"/>
-        <constructor-arg index="2" ref="httpConnectionPoolService"/>
-        <constructor-arg index="3" ref="healthCheckService"/>
+        <constructor-arg index="0" ref="configurationManager"/>
+        <constructor-arg index="1" ref="httpConnectionPoolService"/>
+        <constructor-arg index="2" ref="healthCheckService"/>
     </bean>
 
     <bean name="akkaServiceClientService"
@@ -31,8 +30,7 @@
     <bean name="akkaServiceClientContext"
           class="com.rackspace.papi.service.context.impl.AkkaServiceClientContext">
 
-        <constructor-arg index="0" ref="serviceRegistry"/>
-        <constructor-arg index="1" ref="akkaServiceClientService"/>
+        <constructor-arg index="0" ref="akkaServiceClientService"/>
     </bean>
 
 </beans>
