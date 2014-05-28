@@ -9,7 +9,6 @@ import com.rackspace.papi.container.config.ContainerConfiguration;
 import com.rackspace.papi.model.Node;
 import com.rackspace.papi.model.ReposeCluster;
 import com.rackspace.papi.model.SystemModel;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.servlet.InitParameter;
@@ -35,7 +34,6 @@ public class ReposeValveControllerContext implements ServiceContext<ControllerSe
     private static final String SERVICE_NAME = "powerapi:/services/controller";
     private final ControllerService controllerService;
     private final ConfigurationService configurationManager;
-    private final ServiceRegistry registry;
     private final SystemModelConfigurationListener systemModelConfigurationListener;
     private final ContainerConfigurationListener containerConfigurationListener;
     private String configDir;
@@ -47,19 +45,11 @@ public class ReposeValveControllerContext implements ServiceContext<ControllerSe
     @Autowired
     public ReposeValveControllerContext(
             @Qualifier("controllerService") ControllerService controllerService,
-            @Qualifier("serviceRegistry") ServiceRegistry registry,
             @Qualifier("configurationManager") ConfigurationService configurationManager) {
         this.configurationManager = configurationManager;
-        this.registry = registry;
         this.controllerService = controllerService;
         this.systemModelConfigurationListener = new SystemModelConfigurationListener();
         this.containerConfigurationListener = new ContainerConfigurationListener();
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -82,8 +72,6 @@ public class ReposeValveControllerContext implements ServiceContext<ControllerSe
         URL containerXsdURL = getClass().getResource("/META-INF/schema/container/container-configuration.xsd");
         configurationManager.subscribeTo("container.cfg.xml", containerXsdURL, containerConfigurationListener, ContainerConfiguration.class);
         configurationManager.subscribeTo("system-model.cfg.xml", xsdURL, systemModelConfigurationListener, SystemModel.class);
-        register();
-
     }
 
     @Override

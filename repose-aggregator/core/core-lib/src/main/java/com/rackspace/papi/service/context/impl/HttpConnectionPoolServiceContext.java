@@ -1,7 +1,6 @@
 package com.rackspace.papi.service.context.impl;
 
 import com.rackspace.papi.commons.config.manager.UpdateListener;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.healthcheck.*;
@@ -28,31 +27,22 @@ public class HttpConnectionPoolServiceContext implements ServiceContext<HttpClie
     private static final String httpConnectionPoolServiceReport = "HttpConnectionPoolServiceReport";
 
     private final HttpClientService connectionPoolService;
-    private final ServiceRegistry registry;
     private final ConfigurationService configurationService;
     private final ConfigurationListener configurationListener;
     private final HealthCheckService healthCheckService;
     private String healthCheckUID;
 
     @Autowired
-    public HttpConnectionPoolServiceContext(ServiceRegistry registry,
-                                            ConfigurationService configurationService,
+    public HttpConnectionPoolServiceContext(ConfigurationService configurationService,
                                             HttpClientService connectionPoolService,
                                             HealthCheckService healthCheckService) {
 
-        this.registry = registry;
         this.configurationService = configurationService;
         this.connectionPoolService = connectionPoolService;
         this.healthCheckService = healthCheckService;
         configurationListener = new ConfigurationListener();
         healthCheckUID = healthCheckService.register(HttpConnectionPoolServiceContext.class);
 
-    }
-
-    private void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -82,7 +72,6 @@ public class HttpConnectionPoolServiceContext implements ServiceContext<HttpClie
         } catch (IOException io) {
             LOG.error("Error attempting to search for " + DEFAULT_CONFIG_NAME);
         }
-        register();
     }
 
     @Override

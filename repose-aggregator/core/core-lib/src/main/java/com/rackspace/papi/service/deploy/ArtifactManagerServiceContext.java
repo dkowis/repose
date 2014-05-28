@@ -2,7 +2,6 @@ package com.rackspace.papi.service.deploy;
 
 import com.rackspace.papi.commons.util.thread.DestroyableThreadWrapper;
 import com.rackspace.papi.container.config.ContainerConfiguration;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.event.PowerFilterEvent;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import javax.servlet.ServletContextEvent;
 import java.io.File;
 
+//TODO: this class is xml configged, when it should probably be annotation configed
 public class ArtifactManagerServiceContext implements ServiceContext<ArtifactManager> {
 
    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(ArtifactManagerServiceContext.class);
@@ -23,7 +23,6 @@ public class ArtifactManagerServiceContext implements ServiceContext<ArtifactMan
    private ArtifactManager artifactManager;
    private EventService eventManagerReference;
    private ContainerConfigurationListener containerCfgListener = null;
-   private final ServiceRegistry registry;
    private final ConfigurationService configurationManager;
    private final ThreadingService threadingService;
 
@@ -31,21 +30,13 @@ public class ArtifactManagerServiceContext implements ServiceContext<ArtifactMan
            ArtifactManager artifactManager,
            EventService eventManagerReference,
            ContainerConfigurationListener containerCfgListener,
-           ServiceRegistry serviceRegistry,
            ConfigurationService configurationManager,
            ThreadingService threadingService) {
       this.artifactManager = artifactManager;
       this.eventManagerReference = eventManagerReference;
       this.containerCfgListener = containerCfgListener;
       this.configurationManager = configurationManager;
-      this.registry = serviceRegistry;
       this.threadingService = threadingService;
-   }
-
-   public void register() {
-      if (registry != null) {
-         registry.addService(this);
-      }
    }
 
    @Override
@@ -70,7 +61,6 @@ public class ArtifactManagerServiceContext implements ServiceContext<ArtifactMan
             watcherThread.start();
          }
       }, PowerFilterEvent.POWER_FILTER_CONFIGURED);
-      register();
    }
 
    @Override

@@ -7,7 +7,6 @@ import com.rackspace.papi.domain.ServicePorts;
 import com.rackspace.papi.model.Node;
 import com.rackspace.papi.model.ReposeCluster;
 import com.rackspace.papi.model.SystemModel;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.routing.RoutingService;
@@ -31,7 +30,6 @@ public class RoutingServiceContext implements ServiceContext<RoutingService> {
     private SystemModel config;
     private ConfigurationService configurationManager;
     private final PowerApiConfigListener configListener;
-    private final ServiceRegistry registry;
     private final ServicePorts servicePorts;
     private String clusterId, nodeId;
     private ReposeInstanceInfo instanceInfo;
@@ -39,22 +37,14 @@ public class RoutingServiceContext implements ServiceContext<RoutingService> {
     @Autowired
     public RoutingServiceContext(
             @Qualifier("routingService") RoutingService service,
-            @Qualifier("serviceRegistry") ServiceRegistry registry,
             @Qualifier("configurationManager") ConfigurationService configurationManager,
             @Qualifier("servicePorts") ServicePorts servicePorts,
             @Qualifier("reposeInstanceInfo") ReposeInstanceInfo instanceInfo) {
         this.service = service;
         configListener = new PowerApiConfigListener();
-        this.registry = registry;
         this.configurationManager = configurationManager;
         this.servicePorts = servicePorts;
         this.instanceInfo = instanceInfo;
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -147,7 +137,6 @@ public class RoutingServiceContext implements ServiceContext<RoutingService> {
         }
         URL xsdURL = getClass().getResource("/META-INF/schema/system-model/system-model.xsd");
         configurationManager.subscribeTo("system-model.cfg.xml", xsdURL, configListener, SystemModel.class);
-        register();
     }
 
     @Override

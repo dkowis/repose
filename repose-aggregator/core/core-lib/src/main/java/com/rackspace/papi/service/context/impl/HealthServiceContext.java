@@ -1,6 +1,5 @@
 package com.rackspace.papi.service.context.impl;
 
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.healthcheck.HealthCheckService;
 import org.slf4j.Logger;
@@ -13,20 +12,11 @@ public class HealthServiceContext implements ServiceContext<HealthCheckService> 
 
     private static final Logger LOG = LoggerFactory.getLogger(HealthServiceContext.class);
     public static final String SERVICE_NAME = "powerapi:/services/HealthCheckService";
-    private final ServiceRegistry registry;
     private final HealthCheckService service;
 
     @Autowired
-    public HealthServiceContext(ServiceRegistry registry,HealthCheckService service){
-
-        this.registry = registry;
+    public HealthServiceContext(HealthCheckService service){
         this.service = service;
-    }
-
-    private void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -42,7 +32,6 @@ public class HealthServiceContext implements ServiceContext<HealthCheckService> 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         LOG.debug("Initializing context for Health Check Service");
-        register();
     }
 
     @Override

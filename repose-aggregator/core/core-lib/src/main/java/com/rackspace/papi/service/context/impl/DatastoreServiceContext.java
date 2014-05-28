@@ -1,9 +1,7 @@
 package com.rackspace.papi.service.context.impl;
 
 import com.rackspace.papi.domain.ReposeInstanceInfo;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.context.ServiceContext;
-import com.rackspace.papi.components.datastore.Datastore;
 import com.rackspace.papi.service.datastore.DatastoreService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,23 +17,15 @@ public class DatastoreServiceContext implements ServiceContext<DatastoreService>
     public static final String SERVICE_NAME = "powerapi:/datastore/service";
 
     private final DatastoreService datastoreService;
-    private final ServiceRegistry registry;
     private ReposeInstanceInfo instanceInfo;
     @Autowired
     public DatastoreServiceContext(
             @Qualifier("datastoreService") DatastoreService datastoreService,
-            @Qualifier("serviceRegistry") ServiceRegistry registry,
             @Qualifier("reposeInstanceInfo") ReposeInstanceInfo instanceInfo) {
         this.datastoreService = datastoreService;
-        this.registry = registry;
         this.instanceInfo = instanceInfo;
     }
 
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
-    }
 
     @Override
     public DatastoreService getService() {
@@ -55,6 +45,6 @@ public class DatastoreServiceContext implements ServiceContext<DatastoreService>
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        register();
+
     }
 }

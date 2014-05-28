@@ -4,9 +4,7 @@ import com.rackspace.papi.commons.util.StringUtilities;
 import com.rackspace.papi.commons.util.http.HttpsURLConnectionSslInitializer;
 import com.rackspace.papi.domain.ReposeInstanceInfo;
 import com.rackspace.papi.domain.ServicePorts;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.context.ContextAdapter;
-import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.context.ServletContextAware;
 import com.rackspace.papi.service.context.ServletContextHelper;
 import com.rackspace.papi.service.context.banner.PapiBanner;
@@ -19,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -32,6 +31,8 @@ import java.util.Map;
  * # YES: http://stackoverflow.com/questions/10738816/deploying-a-servlet-programmatically-with-
  * TODO: THIS WHOLE CLASS SHOULD DIEEEEEE!!!!!!!!!!!!1111111111111
  */
+//Lets see if I can haxor this into a bean, and like, make it go
+@Component
 public class PowerApiContextManager implements ServletContextListener {
 
    private static final Logger LOG = LoggerFactory.getLogger(PowerApiContextManager.class);
@@ -41,6 +42,7 @@ public class PowerApiContextManager implements ServletContextListener {
    private ReposeInstanceInfo instanceInfo;
 
    public PowerApiContextManager() {
+       System.out.println("INITIALIZING STUPID CONTEXT THINGY");
    }
 
    public PowerApiContextManager setPorts(ServicePorts ports, ReposeInstanceInfo instanceInfo) {
@@ -64,8 +66,10 @@ public class PowerApiContextManager implements ServletContextListener {
           LOG.warn("***DEPRECATED*** The default connection framework has changed from Jersey to Apache HttpClient!");
       }
 
+       //TODO: these thingies need to be called somewhere
       configurePorts(context);
       configureReposeInfo(context);
+
       Thread.currentThread().setName(instanceInfo.toString());
       context.getBean("exporter");
 
@@ -85,7 +89,7 @@ public class PowerApiContextManager implements ServletContextListener {
    }
 
     //TODO: this will have to be handled somewhere else also
-    // Probably a standalone bean?
+    // Probably a standalone bean? -- Maybe not, it's initialized in two different places...
    private void configureReposeInfo(ApplicationContext context) {
       if (instanceInfo == null) {
 
@@ -146,10 +150,15 @@ public class PowerApiContextManager implements ServletContextListener {
       return System.getProperty(InitParameter.MANAGEMENT_PORT.getParameterName()) != null;
    }
 
+    /**
+     * Given a couple TODOs, this entire method is unnecessary
+     * @param sce
+     */
    @Override
    public void contextInitialized(ServletContextEvent sce) {
       final ServletContext servletContext = sce.getServletContext();
 
+       //TODO: find a home for this thingy
       final String insecureProp = InitParameter.INSECURE.getParameterName();
       final String insecure = System.getProperty(insecureProp, servletContext.getInitParameter(insecureProp));
 
@@ -167,14 +176,11 @@ public class PowerApiContextManager implements ServletContextListener {
       // configuration so we need to set our naming context in the servlet context
       // first before anything else
        //TODO: why not do this in spring? Put this into a bean of some sort instead
+       //Replaced with the ContextLoaderListener. That will tie the spring lifecycle to the servlet lifecycle, which is
+       // Exactly what we want.
       ServletContextHelper.configureInstance(
               servletContext,
               applicationContext);
-
-       //Programmatically at this point create a servlet context bean.
-       // At this point, there will be a component available to autowire in.
-       // I think this will properly make things work...
-       // http://www.carlobonamico.com/blog/?p=55
 
       intializeServices(sce);
       servletContext.setAttribute("powerApiContextManager", this);
@@ -185,20 +191,19 @@ public class PowerApiContextManager implements ServletContextListener {
       return contextInitialized;
    }
 
+    /**
+     * This entire method is unnecessary with the ContextLoaderListener
+     * @param sce
+     */
    @Override
    public void contextDestroyed(ServletContextEvent sce) {
       contextInitialized = false;
+
 
       Map<String, ServletContextAware> contextAwareBeans = applicationContext.getBeansOfType(ServletContextAware.class);
 
       for (ServletContextAware bean : contextAwareBeans.values()) {
          bean.contextDestroyed(sce);
-      }
-
-       //TODO: get rid of the service registry
-      ServiceRegistry registry = applicationContext.getBean("serviceRegistry", ServiceRegistry.class);
-      for (ServiceContext ctx : registry.getServices()) {
-         ctx.contextDestroyed(sce);
       }
 
       LOG.info("Shutting down Spring application context");

@@ -2,6 +2,7 @@ package com.rackspace.papi.domain;
 
 import org.springframework.stereotype.Component;
 
+//TODO: this should NOT be a component, it is NOT a singleton
 @Component("reposeInstanceInfo")
 public class ReposeInstanceInfo {
    
@@ -22,6 +23,7 @@ public class ReposeInstanceInfo {
    }
 
    public ReposeInstanceInfo() {
+
    }
 
    public String getClusterId() {

@@ -5,7 +5,6 @@ import com.rackspace.papi.components.datastore.distributed.ClusterView;
 import com.rackspace.papi.components.datastore.impl.distributed.ThreadSafeClusterView;
 import com.rackspace.papi.domain.ReposeInstanceInfo;
 import com.rackspace.papi.model.SystemModel;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.datastore.DatastoreAccessControl;
@@ -47,7 +46,6 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
     private ConfigurationService configurationManager;
     private ClusterView clusterView;
     private ReposeInstanceInfo reposeInstanceInfo;
-    private ServiceRegistry registry;
     private HealthCheckService healthCheckService;
     private String healthCheckUID;
 
@@ -55,12 +53,10 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
     public DistributedDatastoreServiceClusterContext(@Qualifier("configurationManager") ConfigurationService configurationManager,
                                                      @Qualifier("clusterViewService") DistributedDatastoreServiceClusterViewService service,
                                                      @Qualifier("reposeInstanceInfo") ReposeInstanceInfo reposeInstanceInfo,
-                                                     @Qualifier("serviceRegistry") ServiceRegistry registry,
                                                      @Qualifier("healthCheckService") HealthCheckService healthCheckService) {
         this.configurationManager = configurationManager;
         this.service = service;
         this.reposeInstanceInfo = reposeInstanceInfo;
-        this.registry = registry;
         this.healthCheckService = healthCheckService;
         healthCheckUID = healthCheckService.register(DistributedDatastoreServiceClusterContext.class);
     }
@@ -73,12 +69,6 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
     @Override
     public DistributedDatastoreServiceClusterViewService getService() {
         return service;
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     private class DistributedDatastoreConfigurationListener implements UpdateListener<DistributedDatastoreConfiguration> {
@@ -195,7 +185,6 @@ public class DistributedDatastoreServiceClusterContext implements ServiceContext
             LOG.error("Unable to search for " + DEFAULT_CONFIG);
         }
         sce.getServletContext().setAttribute("ddClusterViewService", service);
-        register();
     }
 
     @Override

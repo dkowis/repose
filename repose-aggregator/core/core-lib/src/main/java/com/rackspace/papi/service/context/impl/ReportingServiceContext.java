@@ -3,7 +3,6 @@ package com.rackspace.papi.service.context.impl;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.container.config.ContainerConfiguration;
 import com.rackspace.papi.model.*;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.reporting.ReportingService;
@@ -24,27 +23,18 @@ public class ReportingServiceContext implements ServiceContext<ReportingService>
     private final ContainerConfigurationListener containerConfigurationListener;
     private final SystemModelListener systemModelListener;
     private final ConfigurationService configurationManager;
-    private final ServiceRegistry registry;
     private final ReportingService reportingService;
     private final Object jmxResetTimeKey = new Object();
     private final List<String> destinationIds = new ArrayList<String>();
     private int jmxResetTime = DEFAULT_JMX_RESET_TIME_SECONDS;
 
     @Autowired
-    public ReportingServiceContext(@Qualifier("serviceRegistry") ServiceRegistry registry,
-                                   @Qualifier("configurationManager") ConfigurationService configurationManager,
+    public ReportingServiceContext(@Qualifier("configurationManager") ConfigurationService configurationManager,
                                    @Qualifier("reportingService") ReportingService reportingService) {
         this.containerConfigurationListener = new ContainerConfigurationListener();
         this.systemModelListener = new SystemModelListener();
-        this.registry = registry;
         this.configurationManager = configurationManager;
         this.reportingService = reportingService;
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -63,7 +53,6 @@ public class ReportingServiceContext implements ServiceContext<ReportingService>
         URL containerXsdURL = getClass().getResource("/META-INF/schema/container/container-configuration.xsd");
         configurationManager.subscribeTo("system-model.cfg.xml", xsdURL, systemModelListener, SystemModel.class);
         configurationManager.subscribeTo("container.cfg.xml", containerXsdURL, containerConfigurationListener, ContainerConfiguration.class);
-        register();
     }
 
     @Override

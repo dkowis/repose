@@ -5,15 +5,14 @@ import com.rackspace.papi.commons.config.parser.properties.PropertiesFileConfigu
 import com.rackspace.papi.commons.util.StringUtilities;
 import com.rackspace.papi.container.config.ContainerConfiguration;
 import com.rackspace.papi.container.config.LoggingConfiguration;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.logging.LoggingService;
-import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
+import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -28,20 +27,12 @@ public class LoggingServiceContext implements ServiceContext<LoggingService> {
    private final ContainerConfigurationListener configurationListener;
    private final LoggingConfigurationListener loggingConfigurationListener;
    private String loggingConfigurationConfig = "";
-   private final ServiceRegistry registry;
 
-   public LoggingServiceContext(LoggingService loggingService, ServiceRegistry registry, ConfigurationService configurationManager) {
+   public LoggingServiceContext(LoggingService loggingService, ConfigurationService configurationManager) {
       this.loggingService = loggingService;
       this.configurationListener = new ContainerConfigurationListener();
       this.loggingConfigurationListener = new LoggingConfigurationListener();
       this.configurationManager = configurationManager;
-      this.registry = registry;
-   }
-
-   public void register() {
-      if (registry != null) {
-         registry.addService(this);
-      }
    }
 
    @Override
@@ -117,8 +108,7 @@ public class LoggingServiceContext implements ServiceContext<LoggingService> {
    public void contextInitialized(ServletContextEvent servletContextEvent) {
       URL containerXsdURL = getClass().getResource("/META-INF/schema/container/container-configuration.xsd");
 
-      configurationManager.subscribeTo("container.cfg.xml",containerXsdURL, configurationListener, ContainerConfiguration.class);
-      register();
+      configurationManager.subscribeTo("container.cfg.xml", containerXsdURL, configurationListener, ContainerConfiguration.class);
    }
 
    @Override

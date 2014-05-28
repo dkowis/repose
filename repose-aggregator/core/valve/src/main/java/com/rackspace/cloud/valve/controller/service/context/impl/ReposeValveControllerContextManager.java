@@ -1,6 +1,5 @@
 package com.rackspace.cloud.valve.controller.service.context.impl;
 
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.context.ContextAdapter;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.context.ServletContextHelper;
@@ -58,11 +57,6 @@ public class ReposeValveControllerContextManager implements ServletContextListen
 
    @Override
    public void contextDestroyed(ServletContextEvent sce) {
-      ServiceRegistry registry = applicationContext.getBean("serviceRegistry", ServiceRegistry.class);
-      for (ServiceContext ctx : registry.getServices()) {
-         ctx.contextDestroyed(sce);
-      }
-
       LOG.info("Shutting down Spring application context");
       applicationContext.close();
       CacheManager instance = CacheManager.getInstance();

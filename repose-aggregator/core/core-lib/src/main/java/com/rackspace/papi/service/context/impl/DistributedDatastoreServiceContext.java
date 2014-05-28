@@ -6,7 +6,6 @@ import com.rackspace.papi.domain.ServicePorts;
 import com.rackspace.papi.model.ReposeCluster;
 import com.rackspace.papi.model.Service;
 import com.rackspace.papi.model.SystemModel;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.datastore.DatastoreService;
@@ -32,7 +31,6 @@ public class DistributedDatastoreServiceContext implements ServiceContext<Distri
     private ConfigurationService configurationManager;
     private SystemModelConfigurationListener systemModelConfigurationListener;
     private DatastoreService datastoreService;
-    private ServiceRegistry registry;
     private ServicePorts servicePorts;
     private RoutingService routingService;
     private String configDirectory;
@@ -42,7 +40,6 @@ public class DistributedDatastoreServiceContext implements ServiceContext<Distri
                                               @Qualifier("reposeInstanceInfo") ReposeInstanceInfo reposeInstanceInfo,
                                               @Qualifier("configurationManager") ConfigurationService configurationManager,
                                               @Qualifier("datastoreService") DatastoreService datastoreService,
-                                              @Qualifier("serviceRegistry") ServiceRegistry registry,
                                               @Qualifier("servicePorts") ServicePorts servicePorts,
                                               @Qualifier("routingService") RoutingService routingService) {
 
@@ -51,15 +48,8 @@ public class DistributedDatastoreServiceContext implements ServiceContext<Distri
         this.configurationManager = configurationManager;
         this.systemModelConfigurationListener = new SystemModelConfigurationListener();
         this.datastoreService = datastoreService;
-        this.registry = registry;
         this.servicePorts = servicePorts;
         this.routingService = routingService;
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -78,7 +68,6 @@ public class DistributedDatastoreServiceContext implements ServiceContext<Distri
         configDirectory = System.getProperty(configProp, sce.getServletContext().getInitParameter(configProp));
         URL xsdURL = getClass().getResource("/META-INF/schema/system-model/system-model.xsd");
         configurationManager.subscribeTo("system-model.cfg.xml", xsdURL, systemModelConfigurationListener, SystemModel.class);
-        register();
     }
 
     private class SystemModelConfigurationListener implements UpdateListener<SystemModel> {

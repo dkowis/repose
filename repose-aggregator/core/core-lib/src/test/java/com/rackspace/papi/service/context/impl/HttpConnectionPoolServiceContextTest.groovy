@@ -3,7 +3,6 @@ package com.rackspace.papi.service.context.impl
 import com.rackspace.papi.commons.config.manager.UpdateListener
 import com.rackspace.papi.commons.config.resource.ConfigurationResource
 import com.rackspace.papi.commons.config.resource.ConfigurationResourceResolver
-import com.rackspace.papi.service.ServiceRegistry
 import com.rackspace.papi.service.config.ConfigurationService
 import com.rackspace.papi.service.healthcheck.HealthCheckReport
 import com.rackspace.papi.service.healthcheck.HealthCheckService
@@ -22,7 +21,6 @@ class HttpConnectionPoolServiceContextTest {
 
     HttpConnectionPoolServiceContext httpConnectionPoolServiceContext
     HealthCheckService healthCheckService
-    ServiceRegistry serviceRegistry;
     ConfigurationService configurationService;
     HttpClientService httpClientService;
     ServletContextEvent sce
@@ -32,7 +30,6 @@ class HttpConnectionPoolServiceContextTest {
     void setUp() {
 
         configurationService = mock(ConfigurationService.class)
-        serviceRegistry = mock(ServiceRegistry.class)
         httpClientService = mock(HttpClientService.class)
         healthCheckService = mock(HealthCheckService.class)
         when(healthCheckService.register(any(HttpConnectionPoolServiceContext.class))).thenReturn("UID")
@@ -59,7 +56,6 @@ class HttpConnectionPoolServiceContextTest {
 
         httpConnectionPoolServiceContext.contextInitialized(sce);
         verify(healthCheckService, times(1)).reportIssue(any(String), any(String), any(HealthCheckReport.class));
-        verify(serviceRegistry, times(1)).addService(any(ServiceRegistry.class));
     }
 
     @Test
@@ -82,7 +78,6 @@ class HttpConnectionPoolServiceContextTest {
 
         httpConnectionPoolServiceContext.contextInitialized(sce);
         verify(healthCheckService, times(1)).reportIssue(any(String), any(String), any(HealthCheckReport.class));
-        verify(serviceRegistry, times(1)).addService(any(ServiceRegistry.class));
 
     }
 

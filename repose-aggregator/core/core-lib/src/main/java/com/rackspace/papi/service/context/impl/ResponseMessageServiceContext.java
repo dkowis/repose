@@ -1,20 +1,19 @@
 package com.rackspace.papi.service.context.impl;
 
 import com.rackspace.papi.commons.config.manager.UpdateListener;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.rms.ResponseMessageService;
 import com.rackspace.papi.service.rms.config.ResponseMessagingConfiguration;
-import java.io.IOException;
-import java.net.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContextEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.net.URL;
 
 @Component("responseMessageServiceContext")
 public class ResponseMessageServiceContext implements ServiceContext<ResponseMessageService> {
@@ -23,23 +22,14 @@ public class ResponseMessageServiceContext implements ServiceContext<ResponseMes
      private static final Logger LOG = LoggerFactory.getLogger(ResponseMessageServiceContext.class);
     private final ResponseMessageService messageService;
     private final UpdateListener<ResponseMessagingConfiguration> configListener = new ResponseMessagingServiceListener();
-    private final ServiceRegistry registry;
     private final ConfigurationService configurationService;
 
     @Autowired
     public ResponseMessageServiceContext(
             @Qualifier("responseMessagingService") ResponseMessageService messageService,
-            @Qualifier("serviceRegistry") ServiceRegistry registry,
             @Qualifier("configurationManager") ConfigurationService configurationService) {
         this.messageService = messageService;
-        this.registry = registry;
         this.configurationService = configurationService;
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -51,7 +41,6 @@ public class ResponseMessageServiceContext implements ServiceContext<ResponseMes
         if(!configurationService.getResourceResolver().resolve("response-messaging.cfg.xml").exists()){
           messageService.setInitialized();
         }
-    register();
      } catch(IOException e){
         LOG.debug("Response messaging configuration file does not exist", e); 
      }

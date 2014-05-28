@@ -3,7 +3,6 @@ package com.rackspace.papi.service.datastore.distributed.impl.distributed.cluste
 import com.rackspace.papi.commons.config.resource.ConfigurationResource
 import com.rackspace.papi.commons.config.resource.ConfigurationResourceResolver
 import com.rackspace.papi.domain.ReposeInstanceInfo
-import com.rackspace.papi.service.ServiceRegistry
 import com.rackspace.papi.service.config.ConfigurationService
 import com.rackspace.papi.service.context.impl.MetricsServiceContext
 import com.rackspace.papi.service.healthcheck.HealthCheckReport
@@ -24,7 +23,6 @@ class DistributedDatastoreServiceClusterContextTest {
     ConfigurationService configurationService;
     DistributedDatastoreServiceClusterViewService datastoreServiceClusterViewService;
     ReposeInstanceInfo reposeInstanceInfo;
-    ServiceRegistry serviceRegistry;
     ServletContextEvent sce;
 
 
@@ -36,7 +34,6 @@ class DistributedDatastoreServiceClusterContextTest {
         configurationService = mock(ConfigurationService.class)
         datastoreServiceClusterViewService = mock(DistributedDatastoreServiceClusterViewService.class)
         reposeInstanceInfo = mock(ReposeInstanceInfo.class)
-        serviceRegistry = mock(ServiceRegistry.class)
         distributedDatastoreServiceClusterContext = new DistributedDatastoreServiceClusterContext(configurationService,
         datastoreServiceClusterViewService, reposeInstanceInfo, serviceRegistry, healthCheckService);
         sce = mock(ServletContextEvent.class)

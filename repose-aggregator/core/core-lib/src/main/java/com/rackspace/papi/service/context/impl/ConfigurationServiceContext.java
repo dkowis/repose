@@ -3,7 +3,6 @@ package com.rackspace.papi.service.context.impl;
 import com.rackspace.papi.commons.config.resource.impl.FileDirectoryResourceResolver;
 import com.rackspace.papi.commons.util.StringUtilities;
 import com.rackspace.papi.jmx.ConfigurationInformation;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.config.impl.PowerApiConfigurationUpdateManager;
 import com.rackspace.papi.service.context.ServiceContext;
@@ -11,13 +10,14 @@ import com.rackspace.papi.service.context.ServletContextHelper;
 import com.rackspace.papi.service.event.common.EventService;
 import com.rackspace.papi.servlet.InitParameter;
 import com.rackspace.papi.servlet.PowerApiContextException;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 
 @Component("configurationServiceContext")
 public class ConfigurationServiceContext implements ServiceContext<ConfigurationService> {
@@ -25,23 +25,14 @@ public class ConfigurationServiceContext implements ServiceContext<Configuration
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationServiceContext.class);
     public static final String SERVICE_NAME = "powerapi:/services/configuration";
     private final ConfigurationService configurationManager;
-    private final ServiceRegistry registry;
    private final EventService eventService;
 
     @Autowired
     public ConfigurationServiceContext(
             @Qualifier("configurationManager") ConfigurationService configurationManager, 
-            @Qualifier("serviceRegistry") ServiceRegistry registry,
             @Qualifier("eventManager") EventService eventSerivce) {
        this.configurationManager = configurationManager;
-       this.registry = registry;
        this.eventService = eventSerivce;
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -75,7 +66,6 @@ public class ConfigurationServiceContext implements ServiceContext<Configuration
         papiUpdateManager.initialize(ctx);
 
         configurationManager.setUpdateManager(papiUpdateManager);
-        register();
     }
 
     @Override

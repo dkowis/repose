@@ -1,8 +1,7 @@
 package com.rackspace.papi.service.context.impl;
 
-import com.rackspace.papi.service.ServiceRegistry;
-import com.rackspace.papi.service.serviceclient.akka.AkkaServiceClient;
 import com.rackspace.papi.service.context.ServiceContext;
+import com.rackspace.papi.service.serviceclient.akka.AkkaServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,21 +18,12 @@ public class AkkaServiceClientContext implements ServiceContext<AkkaServiceClien
     public static final String SERVICE_NAME = "powerapi:/services/AkkaServiceClient";
 
     private final AkkaServiceClient akkaServiceClientService;
-    private final ServiceRegistry registry;
 
 
     @Autowired
-    public AkkaServiceClientContext(ServiceRegistry registry,
-                                    AkkaServiceClient akkaServiceClientService) {
-        this.registry = registry;
+    public AkkaServiceClientContext(AkkaServiceClient akkaServiceClientService) {
         this.akkaServiceClientService = akkaServiceClientService;
 
-    }
-
-    private void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -49,7 +39,6 @@ public class AkkaServiceClientContext implements ServiceContext<AkkaServiceClien
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         LOG.debug("Initializing context for Akka Authentication Service");
-        register();
     }
 
     @Override

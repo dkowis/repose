@@ -5,7 +5,6 @@ import com.rackspace.papi.commons.util.proxy.RequestProxyService
 import com.rackspace.papi.filter.SystemModelInterrogator
 import com.rackspace.papi.model.ReposeCluster
 import com.rackspace.papi.model.SystemModel
-import com.rackspace.papi.service.ServiceRegistry
 import com.rackspace.papi.service.config.ConfigurationService
 import com.rackspace.papi.service.healthcheck.HealthCheckReport
 import com.rackspace.papi.service.healthcheck.HealthCheckService
@@ -42,7 +41,6 @@ class RequestProxyServiceContextTest extends Specification {
         logger.addAppender(new WriterAppender(new SimpleLayout(), log))
 
         def requestProxyService = mock(RequestProxyService.class)
-        def serviceRegistry = mock(ServiceRegistry.class)
         systemModelInterrogator = mock(SystemModelInterrogator.class)
         configurationService = mock(ConfigurationService.class)
         healthCheckService = mock(HealthCheckService.class)

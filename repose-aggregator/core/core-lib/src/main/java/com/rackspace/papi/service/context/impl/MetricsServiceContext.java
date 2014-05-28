@@ -1,7 +1,6 @@
 package com.rackspace.papi.service.context.impl;
 
 import com.rackspace.papi.commons.config.manager.UpdateListener;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.healthcheck.*;
@@ -32,30 +31,21 @@ public class MetricsServiceContext implements ServiceContext<MetricsService> {
     private static final String metricsServiceConfigReport = "MetricsServiceReport";
 
     private final MetricsService metricsService;
-    private final ServiceRegistry registry;
     private final ConfigurationService configurationService;
     private final MetricsCfgListener metricsCfgListener;
     private final HealthCheckService healthCheckService;
     private String healthCheckUID;
 
     @Autowired
-    public MetricsServiceContext(@Qualifier("serviceRegistry") ServiceRegistry registry,
-                                 @Qualifier("configurationManager") ConfigurationService configurationService,
+    public MetricsServiceContext(@Qualifier("configurationManager") ConfigurationService configurationService,
                                  @Qualifier("metricsService") MetricsService metricsService,
                                  @Qualifier("healthCheckService") HealthCheckService healthCheckService) {
 
-        this.registry = registry;
         this.configurationService = configurationService;
         this.metricsService = metricsService;
         metricsCfgListener = new MetricsCfgListener();
         this.healthCheckService = healthCheckService;
         healthCheckUID = healthCheckService.register(MetricsServiceContext.class);
-    }
-
-    private void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -88,7 +78,6 @@ public class MetricsServiceContext implements ServiceContext<MetricsService> {
         }catch(IOException io){
             LOG.error("Error attempting to search for " + DEFAULT_CONFIG_NAME);
         }
-        register();
     }
 
     @Override

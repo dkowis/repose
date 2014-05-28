@@ -1,6 +1,5 @@
 package com.rackspace.papi.service.threading.impl;
 
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.threading.ThreadingService;
 
@@ -23,18 +22,8 @@ public class ThreadingServiceContext implements ServiceContext<ThreadingService>
     public static final String SERVICE_NAME = "powerapi:/kernel/threading";
     private final Set<WeakReference<Thread>> liveThreadReferences;
 
-    @Inject
-    private ServiceRegistry registry;
-
     public ThreadingServiceContext() {
         liveThreadReferences = new HashSet<WeakReference<Thread>>();
-        registry = null;
-    }
-
-    @PostConstruct
-    public void register() {
-        //I don't believe a null check is valid here, and if it is null this means bad things happen.
-        registry.addService(this);
     }
 
     //TODO: find a way to move the contextDestroyed stuff into @PreDestroy if we need this

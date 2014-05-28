@@ -5,7 +5,6 @@ import com.rackspace.papi.domain.Port;
 import com.rackspace.papi.domain.ServicePorts;
 import com.rackspace.papi.jmx.ConfigurationInformation;
 import com.rackspace.papi.model.*;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ContextAdapter;
 import com.rackspace.papi.service.context.ServletContextHelper;
@@ -56,7 +55,6 @@ public class RequestHeaderServiceContextTest {
         healthCheckService = mock(HealthCheckService.class);
         configurationService = mock(ConfigurationService.class);
         servletContextEvent = mock(ServletContextEvent.class);
-        ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
         ServletContext servletContext = mock(ServletContext.class);
         ContextAdapter contextAdapter = mock(ContextAdapter.class);
         RequestHeaderService requestHeaderService = mock(RequestHeaderService.class);
@@ -70,7 +68,7 @@ public class RequestHeaderServiceContextTest {
         when(contextAdapter.getReposeVersion()).thenReturn("4.0.0");
         when(healthCheckService.register(any(Class.class))).thenReturn("test_uid");
 
-        requestHeaderServiceContext = new RequestHeaderServiceContext(requestHeaderService, serviceRegistry, configurationService, healthCheckService);
+        requestHeaderServiceContext = new RequestHeaderServiceContext(requestHeaderService,  configurationService, healthCheckService);
     }
 
     @Test

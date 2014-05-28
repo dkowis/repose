@@ -2,7 +2,6 @@ package com.rackspace.papi.service.context.impl;
 
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.container.config.ContainerConfiguration;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.context.ServletContextHelper;
@@ -20,25 +19,16 @@ public class ResponseHeaderServiceContext implements ServiceContext<ResponseHead
 
     public static final String SERVICE_NAME = "powerapi:/services/response_header";
     private final ResponseHeaderService responseHeaderService;
-    private final ServiceRegistry registry;
     private final ConfigurationService configurationManager;
     private final ContainerConfigurationListener configurationListener;
     private String reposeVersion = "";
 
     @Autowired
     public ResponseHeaderServiceContext(@Qualifier("responseHeaderService") ResponseHeaderService responseHeaderService,
-            @Qualifier("serviceRegistry") ServiceRegistry registry,
             @Qualifier("configurationManager") ConfigurationService configurationManager) {
         this.responseHeaderService = responseHeaderService;
-        this.registry = registry;
         this.configurationManager = configurationManager;
         this.configurationListener = new ContainerConfigurationListener();
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -55,7 +45,6 @@ public class ResponseHeaderServiceContext implements ServiceContext<ResponseHead
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         reposeVersion = ServletContextHelper.getInstance(servletContextEvent.getServletContext()).getPowerApiContext().getReposeVersion();
         configurationManager.subscribeTo("container.cfg.xml", configurationListener, ContainerConfiguration.class);
-        register();
     }
 
     @Override

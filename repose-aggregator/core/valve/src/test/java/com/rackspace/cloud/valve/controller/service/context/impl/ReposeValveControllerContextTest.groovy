@@ -8,7 +8,6 @@ import com.rackspace.papi.model.DestinationEndpoint
 import com.rackspace.papi.model.DestinationList
 import com.rackspace.papi.model.ReposeCluster
 import com.rackspace.papi.model.SystemModel
-import com.rackspace.papi.service.ServiceRegistry
 import com.rackspace.papi.service.config.ConfigurationService
 import com.rackspace.papi.service.naming.ServiceContext
 import org.junit.experimental.runners.Enclosed
@@ -28,29 +27,13 @@ import static org.mockito.Mockito.when
 
 class ReposeValveControllerContextTest extends Specification {
     ServletContextEvent sce
-    ServiceRegistry registry
     ControllerService controllerService
     ConfigurationService configurationService
 
     def setup(){
         sce = mock(ServletContextEvent)
-        registry = mock(ServiceRegistry)
         controllerService = mock(ControllerService)
         configurationService = mock(ConfigurationService)
-
-    }
-
-    def "Register - happy path"() {
-        given:
-        def reposeValveControllerContext = new ReposeValveControllerContext(
-                controllerService, registry, configurationService)
-
-        when:
-        reposeValveControllerContext.register()
-
-        then:
-        verify(registry, times(1)).addService(any(ServiceContext))
-
 
     }
 
@@ -58,13 +41,12 @@ class ReposeValveControllerContextTest extends Specification {
         given:
         when(sce.getServletContext()).thenReturn(new MockServletContext())
         def reposeValveControllerContext = new ReposeValveControllerContext(
-                controllerService, registry, configurationService)
+                controllerService,  configurationService)
 
         when:
         reposeValveControllerContext.contextInitialized(sce)
 
         then:
-        verify(registry, times(1)).addService(any(ServiceContext))
         verify(controllerService, times(1)).setConfigDirectory(anyString())
         !reposeValveControllerContext.isInsecure
 
@@ -73,7 +55,7 @@ class ReposeValveControllerContextTest extends Specification {
     def "Context Destroyed - happy path"() {
         given:
         def reposeValveControllerContext = new ReposeValveControllerContext(
-                controllerService, registry, configurationService)
+                controllerService, configurationService)
 
         when:
         reposeValveControllerContext.contextDestroyed(sce)
@@ -85,7 +67,7 @@ class ReposeValveControllerContextTest extends Specification {
     def "Container configuration updated - no system model"(){
         when:
         def reposeValveControllerContext = new ReposeValveControllerContext(
-                controllerService, registry, configurationService)
+                controllerService, configurationService)
 
         then:
         !reposeValveControllerContext.containerConfigurationListener.initialized
@@ -101,7 +83,7 @@ class ReposeValveControllerContextTest extends Specification {
     def "Container configuration updated - with system model"(){
         when:
         def reposeValveControllerContext = new ReposeValveControllerContext(
-                controllerService, registry, configurationService)
+                controllerService,  configurationService)
         reposeValveControllerContext.systemModel = getValidSystemModel()
 
         then:

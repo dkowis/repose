@@ -7,7 +7,6 @@ import com.rackspace.papi.container.config.ContainerConfiguration;
 import com.rackspace.papi.filter.SystemModelInterrogator;
 import com.rackspace.papi.model.ReposeCluster;
 import com.rackspace.papi.model.SystemModel;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.healthcheck.HealthCheckService;
@@ -31,7 +30,6 @@ public class RequestProxyServiceContext implements ServiceContext<RequestProxySe
 
     private final ConfigurationService configurationManager;
     private final RequestProxyService proxyService;
-    private final ServiceRegistry registry;
     private final ContainerConfigListener configListener;
     private final SystemModelInterrogator interrogator;
     private final SystemModelListener systemModelListener;
@@ -43,23 +41,15 @@ public class RequestProxyServiceContext implements ServiceContext<RequestProxySe
     @Autowired
     public RequestProxyServiceContext(
             @Qualifier("requestProxyService") RequestProxyService proxyService,
-            @Qualifier("serviceRegistry") ServiceRegistry registry,
             @Qualifier("configurationManager") ConfigurationService configurationManager,
             @Qualifier("modelInterrogator") SystemModelInterrogator interrogator,
             @Qualifier("healthCheckService") HealthCheckService healthCheckService) {
         this.proxyService = proxyService;
         this.configurationManager = configurationManager;
-        this.registry = registry;
         this.configListener = new ContainerConfigListener();
         this.systemModelListener = new SystemModelListener();
         this.interrogator = interrogator;
         this.healthCheckService = healthCheckService;
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -124,7 +114,6 @@ public class RequestProxyServiceContext implements ServiceContext<RequestProxySe
 
         configurationManager.subscribeTo("container.cfg.xml", configListener, ContainerConfiguration.class);
         configurationManager.subscribeTo("system-model.cfg.xml", systemModelListener, SystemModel.class);
-        register();
     }
 
     @Override

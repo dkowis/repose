@@ -2,12 +2,10 @@ package com.rackspace.papi.service.context.impl;
 
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.container.config.ContainerConfiguration;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.management.ManagementService;
 import com.rackspace.papi.servlet.InitParameter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,6 @@ public class ManagementServiceContext implements ServiceContext<ManagementServic
 
     public static final String SERVICE_NAME = "powerapi:/services/management";
     private static final String DEFAULT_MANAGEMENT_CONTEXT = "/repose";
-    private final ServiceRegistry registry;
     private final ConfigurationService configurationService;
     private final ManagementService managementService;
     private final ContainerConfigurationListener configurationListener;
@@ -30,19 +27,11 @@ public class ManagementServiceContext implements ServiceContext<ManagementServic
     private String managementContext;
 
     @Autowired
-    public ManagementServiceContext(@Qualifier("serviceRegistry") ServiceRegistry registry,
-            @Qualifier("configurationManager") ConfigurationService configurationService,
+    public ManagementServiceContext(@Qualifier("configurationManager") ConfigurationService configurationService,
             @Qualifier("managementService") ManagementService managementService) {
-        this.registry = registry;
         this.configurationService = configurationService;
         this.managementService = managementService;
         this.configurationListener = new ContainerConfigurationListener();
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -60,7 +49,6 @@ public class ManagementServiceContext implements ServiceContext<ManagementServic
         getManagementPort();
         getManagementContext();
         configurationService.subscribeTo("container.cfg.xml", configurationListener, ContainerConfiguration.class);
-        register();
     }
 
     private void getManagementPort() {

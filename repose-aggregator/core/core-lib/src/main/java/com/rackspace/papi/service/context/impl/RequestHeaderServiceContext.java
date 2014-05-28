@@ -7,7 +7,6 @@ import com.rackspace.papi.domain.ServicePorts;
 import com.rackspace.papi.filter.SystemModelInterrogator;
 import com.rackspace.papi.model.Node;
 import com.rackspace.papi.model.SystemModel;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.context.ServletContextHelper;
@@ -31,7 +30,6 @@ public class RequestHeaderServiceContext implements ServiceContext<RequestHeader
     public static final String SERVICE_NAME = "powerapi:/services/request_header";
 
     private final RequestHeaderService requestHeaderService;
-    private final ServiceRegistry registry;
     private final ConfigurationService configurationManager;
     private final ContainerConfigurationListener configurationListener;
     private final SystemModelListener systemModelListener;
@@ -45,21 +43,13 @@ public class RequestHeaderServiceContext implements ServiceContext<RequestHeader
 
     @Autowired
     public RequestHeaderServiceContext(@Qualifier("requestHeaderService") RequestHeaderService requestHeaderService,
-                                       @Qualifier("serviceRegistry") ServiceRegistry registry,
                                        @Qualifier("configurationManager") ConfigurationService configurationManager,
                                        @Qualifier("healthCheckService") HealthCheckService healthCheckService) {
         this.requestHeaderService = requestHeaderService;
-        this.registry = registry;
         this.configurationManager = configurationManager;
         this.healthCheckService = healthCheckService;
         this.configurationListener = new ContainerConfigurationListener();
         this.systemModelListener = new SystemModelListener();
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -82,7 +72,6 @@ public class RequestHeaderServiceContext implements ServiceContext<RequestHeader
 
         configurationManager.subscribeTo("container.cfg.xml", configurationListener, ContainerConfiguration.class);
         configurationManager.subscribeTo("system-model.cfg.xml", systemModelListener, SystemModel.class);
-        register();
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.rackspace.papi.service.reporting.metrics;
 
 import com.rackspace.papi.commons.config.resource.ConfigurationResource;
 import com.rackspace.papi.commons.config.resource.ConfigurationResourceResolver;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.impl.MetricsServiceContext;
 import com.rackspace.papi.service.healthcheck.HealthCheckReport;
@@ -27,7 +26,6 @@ public class MetricsServiceContextTest {
     public static class EnabledDisabled {
         protected MetricsServiceContext metricsServiceContext;
 
-        protected ServiceRegistry serviceRegistry;
         protected ConfigurationService configurationService;
         protected MetricsService metricsService;
         protected HealthCheckService healthCheckService;
@@ -36,12 +34,11 @@ public class MetricsServiceContextTest {
 
         @Before
         public void setUp() {
-            serviceRegistry = mock(ServiceRegistry.class);
             configurationService = mock(ConfigurationService.class);
             metricsService = mock(MetricsService.class);
             healthCheckService = mock(HealthCheckService.class);
             when(healthCheckService.register(MetricsServiceContext.class)).thenReturn("UID");
-            metricsServiceContext = new MetricsServiceContext(serviceRegistry, configurationService, metricsService, healthCheckService);
+            metricsServiceContext = new MetricsServiceContext(configurationService, metricsService, healthCheckService);
             sce = mock(ServletContextEvent.class);
         }
 

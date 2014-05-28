@@ -3,18 +3,16 @@ package com.rackspace.papi.service.context.impl;
 import com.rackspace.papi.commons.config.manager.UpdateListener;
 import com.rackspace.papi.container.config.ContainerConfiguration;
 import com.rackspace.papi.container.config.DeploymentConfiguration;
-import com.rackspace.papi.service.ServiceRegistry;
 import com.rackspace.papi.service.config.ConfigurationService;
 import com.rackspace.papi.service.context.ServiceContext;
 import com.rackspace.papi.service.context.container.ContainerConfigurationService;
-
-import java.net.URL;
-import javax.servlet.ServletContextEvent;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.ServletContextEvent;
+import java.net.URL;
 
 @Component("containerServiceContext")
 public class ContainerServiceContext implements ServiceContext<ContainerConfigurationService> {
@@ -26,23 +24,14 @@ public class ContainerServiceContext implements ServiceContext<ContainerConfigur
     private final ContainerConfigurationListener configurationListener;
     private ContainerConfigurationService containerConfigurationService;
     private ConfigurationService configurationManager;
-    private final ServiceRegistry registry;
 
     @Autowired
     public ContainerServiceContext(
             @Qualifier("containerConfigurationService") ContainerConfigurationService containerConfigurationService,
-            @Qualifier("serviceRegistry") ServiceRegistry registry,
             @Qualifier("configurationManager") ConfigurationService configurationManager) {
         this.containerConfigurationService = containerConfigurationService;
         this.configurationListener = new ContainerConfigurationListener();
         this.configurationManager = configurationManager;
-        this.registry = registry;
-    }
-
-    public void register() {
-        if (registry != null) {
-            registry.addService(this);
-        }
     }
 
     @Override
@@ -90,7 +79,6 @@ public class ContainerServiceContext implements ServiceContext<ContainerConfigur
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         URL xsdURL = getClass().getResource("/META-INF/schema/container/container-configuration.xsd");
         configurationManager.subscribeTo("container.cfg.xml", xsdURL, configurationListener, ContainerConfiguration.class);
-        register();
     }
 
     @Override
