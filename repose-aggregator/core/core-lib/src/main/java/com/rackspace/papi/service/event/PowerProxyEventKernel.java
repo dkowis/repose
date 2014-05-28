@@ -1,24 +1,46 @@
 package com.rackspace.papi.service.event;
 
 import com.rackspace.papi.commons.util.Destroyable;
+import com.rackspace.papi.commons.util.thread.DestroyableThreadWrapper;
 import com.rackspace.papi.service.event.common.EventDispatcher;
 import com.rackspace.papi.service.event.common.EventService;
+import com.rackspace.papi.service.threading.ThreadingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 
 @Component("powerProxyEventKernel")
 public class PowerProxyEventKernel implements Runnable, Destroyable {
 
     private static final Logger LOG = LoggerFactory.getLogger(PowerProxyEventKernel.class);
-    private final EventService eventManager;
     private volatile boolean shouldContinue;
+    private DestroyableThreadWrapper eventKernelThread;
 
-    @Autowired
-    public PowerProxyEventKernel(@Qualifier("eventManager") EventService eventManager) {
+    private final EventService eventManager;
+    private final ThreadingService threadingService;
+
+    @Inject
+    public PowerProxyEventKernel(
+            EventService eventManager,
+            ThreadingService threadingService
+    ){
+        this.threadingService = threadingService;
         this.eventManager = eventManager;
+    }
+
+    @PostConstruct
+    public void startThisMadness() {
+        eventKernelThread = new DestroyableThreadWrapper(threadingService.newThread(this, "Event Kernel Thread"), this);
+        eventKernelThread.start();
+    }
+
+    @PreDestroy
+    public void maybeStopThisMadness() {
+        eventKernelThread.destroy();
     }
 
     @Override
