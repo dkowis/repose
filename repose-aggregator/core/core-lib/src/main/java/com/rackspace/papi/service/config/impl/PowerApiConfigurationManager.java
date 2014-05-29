@@ -7,14 +7,24 @@ import com.rackspace.papi.commons.config.parser.ConfigurationParserFactory;
 import com.rackspace.papi.commons.config.parser.common.ConfigurationParser;
 import com.rackspace.papi.commons.config.resource.ConfigurationResource;
 import com.rackspace.papi.commons.config.resource.ConfigurationResourceResolver;
+import com.rackspace.papi.commons.config.resource.impl.FileDirectoryResourceResolver;
+import com.rackspace.papi.commons.util.StringUtilities;
 import com.rackspace.papi.jmx.ConfigurationInformation;
 import com.rackspace.papi.service.config.ConfigurationService;
+import com.rackspace.papi.service.context.ServletContextHelper;
+import com.rackspace.papi.service.event.common.EventService;
+import com.rackspace.papi.servlet.InitParameter;
+import com.rackspace.papi.servlet.PowerApiContextException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.ServletContextAware;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import java.io.FileNotFoundException;
 import java.lang.ref.WeakReference;
 import java.net.URL;
@@ -26,13 +36,56 @@ import java.util.Map;
  */
 
 @Component("configurationManager")
-public class PowerApiConfigurationManager implements ConfigurationService {
+public class PowerApiConfigurationManager implements ConfigurationService, ServletContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(PowerApiConfigurationManager.class);
     private final Map<Class, WeakReference<ConfigurationParser>> parserLookaside;
+    private final EventService eventService;
     private ConfigurationUpdateManager updateManager;
     private ConfigurationResourceResolver resourceResolver;
     private ConfigurationInformation configurationInformation;
+
+    private ServletContext context;
+
+
+    @Inject
+    public PowerApiConfigurationManager(
+            EventService eventService,
+            @Qualifier("reposeVersion") String version){
+        this.eventService = eventService;
+
+        //Why is this even here?!?!?!
+        LOG.error("Repose Version: " + version);
+        parserLookaside = new HashMap<Class, WeakReference<ConfigurationParser>>();
+    }
+
+    @Override
+    public void setServletContext(ServletContext servletContext) {
+        this.context = servletContext;
+    }
+
+    @PostConstruct
+    public void initialize() {
+        //Once we have the serlvet context we can do stuff with it.
+        final String configProp = InitParameter.POWER_API_CONFIG_DIR.getParameterName();
+        final String configurationRoot = System.getProperty(configProp, context.getInitParameter(configProp));
+        LOG.debug("Loading configuration files from directory: " + configurationRoot);
+
+        if (StringUtilities.isBlank(configurationRoot)) {
+            throw new PowerApiContextException(
+                    "Power API requires a configuration directory to be specified as an init-param named, \""
+                            + InitParameter.POWER_API_CONFIG_DIR.getParameterName() + "\"");
+        }
+
+        setResourceResolver(new FileDirectoryResourceResolver(configurationRoot));
+        setConfigurationInformation((ConfigurationInformation) ServletContextHelper.getInstance(context).getPowerApiContext().reposeConfigurationInformation());
+
+        final PowerApiConfigurationUpdateManager papiUpdateManager = new PowerApiConfigurationUpdateManager(eventService);
+        papiUpdateManager.initialize(context);
+
+        setUpdateManager(papiUpdateManager);
+    }
+
 
     @Override
     public ConfigurationInformation getConfigurationInformation() {
@@ -42,13 +95,6 @@ public class PowerApiConfigurationManager implements ConfigurationService {
     @Override
     public void setConfigurationInformation(ConfigurationInformation configurationInformation) {
         this.configurationInformation = configurationInformation;
-    }
-
-
-    @Autowired
-    public PowerApiConfigurationManager(@Qualifier("reposeVersion") String version) {
-        LOG.error("Repose Version: " + version);
-        parserLookaside = new HashMap<Class, WeakReference<ConfigurationParser>>();
     }
 
     @Override
@@ -157,5 +203,5 @@ public class PowerApiConfigurationManager implements ConfigurationService {
 
         return parser;
     }
-   
+
 }

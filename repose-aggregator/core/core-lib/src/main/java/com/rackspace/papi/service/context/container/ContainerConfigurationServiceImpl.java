@@ -1,9 +1,12 @@
 package com.rackspace.papi.service.context.container;
 
 import com.rackspace.papi.domain.ServicePorts;
+import com.rackspace.papi.service.config.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
 
 
 @Component("containerConfigurationService")
@@ -13,12 +16,10 @@ public class ContainerConfigurationServiceImpl implements ContainerConfiguration
     private String viaValue;
     private Long contentBodyReadLimit;
 
-    public ContainerConfigurationServiceImpl() {
-    }
-
-    @Autowired
-    public ContainerConfigurationServiceImpl(@Qualifier("servicePorts") ServicePorts ports) {
+    @Inject
+    public ContainerConfigurationServiceImpl(ConfigurationService configurationService,@Qualifier("servicePorts") ServicePorts ports) {
         this.ports.addAll(ports);
+
     }
 
     public ContainerConfigurationServiceImpl(String via, Long contentBodyReadLimit, ServicePorts ports) {
